@@ -1,12 +1,9 @@
 % script name: "adding_path_rational_app"
 
 addpath(pwd);
-addpath(genpath('test scripts'))
-addpath(genpath('Polynomial app'))
-addpath(genpath('Chebyshev-Pade rational app'))
-addpath(genpath('Make figures'))
-addpath(genpath('Extra demos'))
-%addpath(genpath('Matrix functions'))
 
-fprintf('Path updated \n');
+addpath(genpath('polynomial_approximation'))
+addpath(genpath('make_figures'))
+
+fprintf('Path updated! \n For reproducing figures, make sure to add "chebfun" \n');
 

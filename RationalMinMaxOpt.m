@@ -11,7 +11,7 @@ function [p, q, zval] = RationalMinMaxOpt(f, n, m, pts, LB, UB, a, b, prc, vrb)
 % 	prc - precision of the bisection (maximum deviation accuracy)
 %   vrb - flag for verbose run
 % Ouput:
-%   p,q - the rational approx coefficients 
+%   p,q - the rational approx coefficients
 %   z   - the maximal deviation
 % Run example:
 %  [p, q, z] = RationalMinMaxOpt(@(x) abs(x), 4, 4, linspace(-1,1,20), .1, 100, 1e-10, 1)
@@ -55,42 +55,37 @@ bma=0.5*(b-a);
 bpa=0.5*(b+a);
 
 % upper bound by polynomial interpolation (degree n+m, chebyshev pts)
-numpts=n+1; %m;
+numpts = n+1; 
 int_pts = vec(bpa+bma*cos( pi* (2.*( numpts:-1:1) -1 ) / (2*numpts )));
-uH = max(abs( f(pts) - barycentric_poly_inter2(int_pts, f(int_pts), pts)));
+uH = max(abs( f(pts) - barycentric_poly_interpolation(int_pts, f(int_pts), pts)));
 while(uH-uL)>prc
     z=(uH+uL)/2;
-    %If the optimal result is lower than distance z 
-%     [p_new,q_new,z_new] = LpRat(f,z,n,m,pts,Tn,Tm,LB,UB,vrb,0.1,-inf);
-%     if length(p_new)>1 && length(q_new)>1 
-%         zval=z_new;
-%         p =p_new;
-%         q = q_new;
-%     end
-%     if (zval<= 1e-16)
     if(checkVal(f,z,n,m,pts,Tn,Tm,LB,UB,vrb,inf,-inf))
         uH=z;
     else
         uL=z;
     end
 end
-%Calculates the optimal p,q 
+
+%Calculates the optimal p,q
 [p,q,zval]=LpRat(f,uH,n,m,pts,Tn,Tm,LB,UB,vrb,inf,-inf);
 end
 
 function bool=checkVal(f,z,n,m,T,Tn,Tm,DLB,DUB,vrb,uH,uL)
-    [~,~,u,~]=LpRat(f,z,n,m,T,Tn,Tm,DLB,DUB,vrb,uH,uL);
-    bool= (u<= 1e-15);% (u<= 10^-15); % exitflag; % To be refined.
+[~,~,u,~]= LpRat(f,z,n,m,T,Tn,Tm,DLB,DUB,vrb,uH,uL);
+bool     = (u<= 1e-15);
 end
 
 function [p,q,u,exitflag] = LpRat(f,z,n,m,T,Tn,Tm,DLB,DUB,vrb,uH,uL)
+
 %cond1 and cond2 are the one by column multiplication of each site and a row of
 %chebyshev matrix
 f1 = f(T)+z;
 f2 = f(T)-z;
 cond1 = f1(:).*Tm(:,:);
 cond2 = f2(:).*Tm(:,:);
-%A is a matrix of constraints corresponds to the inequation Ax<b
+
+% A is a matrix of constraints corresponds to the inequation Ax<b
 A=[Tn -cond1 -ones(length(T),1);
     -Tn cond2 -ones(length(T),1);
     zeros(size(Tn)) -Tm zeros(length(T),1);
@@ -100,16 +95,10 @@ b=[zeros(2*size(Tn,1),1);
     -DLB*ones(length(T),1);
     DUB*ones(length(T),1)];
 
-% lb=[]; %[-inf.*ones(1,n+m+1)];
 lb=[-inf.*ones(1,n) -inf -inf.*ones(1,m-1) uL];
-% lb=[-inf.*ones(1,n) 1 -inf.*ones(1,m-1) uL];
-
-% ub=[inf.*ones(1,n) 1 inf.*ones(1,m)];
 ub=[inf.*ones(1,n) inf  inf.*ones(1,m-1) uH];
-% ub=[inf.*ones(1,n) 1  inf.*ones(1,m-1) uH];
 
 %A dummy varibale in order to arrange in one objective function
-%obj=[zeros(1,n+m) 1];
 obj=[zeros(1,n+m) 1];
 
 if vrb
@@ -130,9 +119,9 @@ if isempty(x)
     q=0;
     u=inf;
 else
-p=x(1:n);
-q=x(n+1:m+n);
-u=x(n+m+1);
+    p=x(1:n);
+    q=x(n+1:m+n);
+    u=x(n+m+1);
 end
 end
 
